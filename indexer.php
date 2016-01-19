@@ -67,7 +67,7 @@ $conn->autocommit("true");
 
 echo "AUTOCOMMIT SET TO TRUE\n";
 
-$query = "select id, content from webpage where status = 2 limit 1";
+$query = "select id, title, baseUrl, text, content from webpage where status = 2 limit 1";
 
 $results = $conn->query($query);
 
@@ -76,18 +76,28 @@ $payload = "";
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
-    $payload = $payload."{\"create\":{}}\n{
-        \"id\" : ".$row['id'].",
-        \"title\" : ".$row['title'].",
-        \"content\" : ".$row['text'].",
-        \"url\" : ".$row['baseUrl'].",
-        \"desc\" : ".$metas['description'].",
-        \"keywords\" : ".$metas['keywords']."}"
+    $payload = $payload."{\"create\":{}}\n{\"id\" : \"".$row['id']."\",\"title\" : \"".$row['title']."\",\"content\" : \"".str_replace('"', '\"', utf8_decode($row['text']))."\",\"url\" : \"".$row['baseUrl']."\",\"desc\" : \"".$metas['description']."\",\"keywords\" : \"".$metas['keywords']."\"}\n"
     ;
+    echo("\n$payload\n");
 }
 
 #bulk index using curl
-$curlUrl = "http://".$es_settings['host']."/".$es_settings['index']."/webpage/_bulk";
+$curlUrl = "http://".$es_settings['host'].":".$es_settings['port']."/".$es_settings['index']."/webpage/_bulk";
+echo $curlUrl;
+$ch = curl_init();
+curl_setopt_array($ch, array(
+    CURLOPT_CUSTOMREQUEST => 'POST',
+    CURLOPT_URL => $curlUrl,
+    CURLOPT_RETURNTRANSFER => 1,
+    CURLOPT_POSTFIELDS => $payload
+));
+
+#execute bulk index
+$response = curl_exec($ch);
+
+echo $response;
+
+curl_close($ch);
 
 # close the connection
 $conn->close();
