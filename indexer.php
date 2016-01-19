@@ -76,7 +76,7 @@ $payload = "";
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
-    $payload = $payload."{\"create\":{}}\n{\"id\" : \"".$row['id']."\",\"title\" : \"".utf8_decode($row['title'])."\",\"content\" : \"".addslashes(utf8_decode($row['text']))."\",\"url\" : \"".$row['baseUrl']."\",\"desc\" : \"".$metas['description']."\",\"keywords\" : \"".$metas['keywords']."\"}\n"
+    $payload = $payload."{\"create\":{}}\n{\"id\" : \"".$row['id']."\",\"title\" : \"".str_replace('"', '\"', utf8_decode($row['title']))."\",\"content\" : \"".str_replace('"', '\"', utf8_decode($row['text']))."\",\"url\" : \"".$row['baseUrl']."\",\"desc\" : \"".$metas['description']."\",\"keywords\" : \"".$metas['keywords']."\"}\n"
     ;
 }
 #bulk index using curl
