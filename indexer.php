@@ -7,7 +7,7 @@
  */
 
 namespace Parser;
-
+include('MetaParser.php');
 use Parser\MetaParser;
 
 $rds_settings = array(
@@ -67,3 +67,27 @@ $conn->autocommit("true");
 
 echo "AUTOCOMMIT SET TO TRUE\n";
 
+$query = "select id, content from webpage where status = 2 limit 1";
+
+$results = $conn->query($query);
+
+# initialize curl payload
+$payload = "";
+# for all results of query
+while($row = mysqli_fetch_assoc($results)) {
+    $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
+    $payload = $payload."{\"create\":{}}\n{
+        \"id\" : ".$row['id'].",
+        \"title\" : ".$row['title'].",
+        \"content\" : ".$row['text'].",
+        \"url\" : ".$row['baseUrl'].",
+        \"desc\" : ".$metas['description'].",
+        \"keywords\" : ".$metas['keywords']."}"
+    ;
+}
+
+#bulk index using curl
+$curlUrl = "http://".$es_settings['host']."/".$es_settings['index']."/webpage/_bulk";
+
+# close the connection
+$conn->close();
