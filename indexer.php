@@ -87,7 +87,6 @@ while($row = mysqli_fetch_assoc($results)) {
     ), JSON_UNESCAPED_SLASHES);
     $payload = $payload."{\"create\":{}}\n".$payloadHalf."\n";
 }
-die($payload);
 #bulk index using curl
 $curlUrl = "http://".$es_settings['host'].":".$es_settings['port']."/".$es_settings['index']."/webpage/_bulk";
 echo "CURL URL: ".$curlUrl;
