@@ -78,13 +78,13 @@ while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
     //$payload = $payload."{\"create\":{}}\n{\"id\" : \"".$row['id']."\",\"title\" : \"".str_replace('"', '\"', utf8_decode($row['title']))."\",\"content\" : \"".str_replace('"', '\"', utf8_decode($row['text']))."\",\"url\" : \"".$row['baseUrl']."\",\"desc\" : \"".$metas['description']."\",\"keywords\" : \"".$metas['keywords']."\"}\n"
     $payload = $payload."{\"create\":{}}\n".json_encode(array(
-        "id" => $row['id'],
+        "id" => utf8_decode($row['id']),
         "title" => utf8_decode($row['title']),
-        "url" => $row['baseUrl'],
+        "url" => utf8_decode($row['baseUrl']),
         "content" => utf8_decode($row['text']),
         "desc"  => empty($metas['description'])?null:utf8_decode($metas['description']),
         "keywords"  => empty($metas['keywords'])?null:utf8_decode($metas['keywords'])
-    ))."\n";
+    ), JSON_UNESCAPED_SLASHES)."\n";
 }
 die($payload);
 #bulk index using curl
