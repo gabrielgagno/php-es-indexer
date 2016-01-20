@@ -88,7 +88,7 @@ while($row = mysqli_fetch_assoc($results)) {
 }
 #bulk index using curl
 $curlUrl = "http://".$es_settings['host'].":".$es_settings['port']."/".$es_settings['index']."/webpage/_bulk";
-echo $curlUrl;
+echo "CURL URL: ".$curlUrl;
 $ch = curl_init();
 curl_setopt_array($ch, array(
     CURLOPT_CUSTOMREQUEST => 'POST',
@@ -97,7 +97,7 @@ curl_setopt_array($ch, array(
     CURLOPT_POSTFIELDS => $payload
 ));
 
-echo "indexing job: starting...\n";
+echo "\nindexing job: starting...\n";
 #execute bulk index
 $response = curl_exec($ch);
 echo $response;
