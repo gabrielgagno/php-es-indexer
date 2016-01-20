@@ -78,12 +78,12 @@ while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
     //$payload = $payload."{\"create\":{}}\n{\"id\" : \"".$row['id']."\",\"title\" : \"".str_replace('"', '\"', utf8_decode($row['title']))."\",\"content\" : \"".str_replace('"', '\"', utf8_decode($row['text']))."\",\"url\" : \"".$row['baseUrl']."\",\"desc\" : \"".$metas['description']."\",\"keywords\" : \"".$metas['keywords']."\"}\n"
     $payloadHalf = json_encode(array(
-        "id" => utf8_decode($row['id']),
-        "title" => utf8_decode($row['title']),
-        "url" => utf8_decode($row['baseUrl']),
-        "content" => utf8_decode($row['text']),
-        "desc"  => empty($metas['description'])?null:utf8_decode($metas['description']),
-        "keywords"  => empty($metas['keywords'])?null:utf8_decode($metas['keywords'])
+        "id" => utf8_encode($row['id']),
+        "title" => utf8_encode($row['title']),
+        "url" => utf8_encode($row['baseUrl']),
+        "content" => utf8_encode($row['text']),
+        "desc"  => empty($metas['description'])?null:utf8_encode($metas['description']),
+        "keywords"  => empty($metas['keywords'])?null:utf8_encode($metas['keywords'])
     ), JSON_UNESCAPED_SLASHES);
     $payload = $payload."{\"create\":{}}\n".$payloadHalf."\n";
 }
