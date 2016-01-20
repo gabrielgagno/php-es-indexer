@@ -76,8 +76,15 @@ $payload = "";
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
-    $payload = $payload."{\"create\":{}}\n{\"id\" : \"".$row['id']."\",\"title\" : \"".str_replace('"', '\"', utf8_decode($row['title']))."\",\"content\" : \"".str_replace('"', '\"', utf8_decode($row['text']))."\",\"url\" : \"".$row['baseUrl']."\",\"desc\" : \"".$metas['description']."\",\"keywords\" : \"".$metas['keywords']."\"}\n"
-    ;
+    //$payload = $payload."{\"create\":{}}\n{\"id\" : \"".$row['id']."\",\"title\" : \"".str_replace('"', '\"', utf8_decode($row['title']))."\",\"content\" : \"".str_replace('"', '\"', utf8_decode($row['text']))."\",\"url\" : \"".$row['baseUrl']."\",\"desc\" : \"".$metas['description']."\",\"keywords\" : \"".$metas['keywords']."\"}\n"
+    $payload = $payload."{\"create\":{}}\n".json_encode(array(
+        "id" => $row['id'],
+        "title" => $row['title'],
+        "url" => $row['baseUrl'],
+        "content" => utf8_decode($row['text']),
+        "desc"  => $metas['description'],
+        "keywords"  => $metas['keywords']
+    ))."\n";
 }
 #bulk index using curl
 $curlUrl = "http://".$es_settings['host'].":".$es_settings['port']."/".$es_settings['index']."/webpage/_bulk";
@@ -93,9 +100,8 @@ curl_setopt_array($ch, array(
 echo "indexing job: starting...\n";
 #execute bulk index
 $response = curl_exec($ch);
-echo "indexing job: done.\n";
-
 echo $response;
+echo "indexing job: done.\n";
 
 curl_close($ch);
 
