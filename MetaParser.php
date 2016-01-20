@@ -66,45 +66,8 @@ class MetaParser
         return $metaArray;
     }
 
-    public static function addSearchString() {
-        $sampArray = array(
-            "business.csv",
-            "shop.csv",
-            "community.csv",
-            "tattoo.csv",
-            "www.csv"
-        );
-
-        $conn = mysqli_connect('localhost', 'root', '', 'nutch');
-        if(!$conn) {
-            die('Not connected : ' . mysqli_error($conn));
-        }
-        $conn->autocommit(true);
-
-        foreach($sampArray as $sArray) {
-            $file = fopen($sArray, 'r');
-            $data = fgetcsv($file);
-            while(!feof($file)) {
-                $actual = null;
-                $data = fgetcsv($file);
-                if(substr($data[1], 0, strlen('http://')) === 'http://'){
-                    $actual = str_replace('http://', '', $data[1]);
-                }
-                else if(substr($data[1], 0, strlen('https://')) === 'https://'){
-                    $actual = str_replace('https://', '', $data[1]);
-                }
-                echo $actual;
-                $statement = "select id from webpage where baseUrl like \"%".$actual."%\"";
-                $results = $conn->query($statement);
-                while($row = mysqli_fetch_assoc($results)) {
-                    echo "ROW ID: ".$row['id']."\n";
-                    echo "DATA: ".$data[0]."\n\n";
-                    $update = "update webpage set aq_md_searchstring=\"$data[0]\" where id like \"%".$row['id']."%\"";
-                    $conn->query($update);
-                    break;
-                }
-            }
-            fclose($file);
-        }
+    public static function getSubdomain($url) {
+        $parseArray = explode(".", parse_url($url)['host']);
+        return $parseArray[0].".".$parseArray[1];
     }
 }
