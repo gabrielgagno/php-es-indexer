@@ -82,8 +82,8 @@ while($row = mysqli_fetch_assoc($results)) {
         "title" => utf8_decode($row['title']),
         "url" => $row['baseUrl'],
         "content" => utf8_decode($row['text']),
-        "desc"  => empty($metas['description'])?null:$metas['description'],
-        "keywords"  => empty($metas['keywords'])?null:$metas['keywords']
+        "desc"  => empty($metas['description'])?null:utf8_decode($metas['description']),
+        "keywords"  => empty($metas['keywords'])?null:utf8_decode($metas['keywords'])
     ))."\n";
 }
 die($payload);
