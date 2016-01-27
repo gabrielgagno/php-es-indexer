@@ -71,12 +71,18 @@ $query = "select id, title, baseUrl, text, content from webpage where status = 2
 
 $results = $conn->query($query);
 
+#bulk index using curl
+$curlUrl = "http://".$es_settings['host'].":".$es_settings['port']."/".$es_settings['index']."/webpage/_bulk";
+echo "CURL URL: ".$curlUrl;
+$ch = curl_init();
+
 # initialize curl payload
 $payload = "";
-$rowNum = 0;
+$rowNum = 1;
+$rowCount = mysqli_num_rows($results);
+die($rowCount);
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
-    echo ++$rowNum."\n";
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
     $payloadHalf = json_encode(array(
         "id" => utf8_encode($row['id']),
@@ -88,17 +94,16 @@ while($row = mysqli_fetch_assoc($results)) {
         "subdomain" => MetaParser::getSubdomain($row['baseUrl'])
     ), JSON_UNESCAPED_SLASHES);
     $payload = $payload."{\"create\":{}}\n".$payloadHalf."\n";
+    if($rowNum%200 == 0 || $rowNum == $rowCount) {
+        curl_setopt_array($ch, array(
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_URL => $curlUrl,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_POSTFIELDS => $payload
+        ));
+    }
+    $rowNum++;
 }
-#bulk index using curl
-$curlUrl = "http://".$es_settings['host'].":".$es_settings['port']."/".$es_settings['index']."/webpage/_bulk";
-echo "CURL URL: ".$curlUrl;
-$ch = curl_init();
-curl_setopt_array($ch, array(
-    CURLOPT_CUSTOMREQUEST => 'POST',
-    CURLOPT_URL => $curlUrl,
-    CURLOPT_RETURNTRANSFER => 1,
-    CURLOPT_POSTFIELDS => $payload
-));
 
 echo "\nindexing job: starting...\n";
 #execute bulk index
