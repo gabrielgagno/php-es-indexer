@@ -82,6 +82,7 @@ $rowNum = 1;
 $rowCount = $results->num_rows;
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
+    echo "DOCUMENT NUMBER: ".$rowNum."\n";
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
     $payloadHalf = json_encode(array(
         "id" => utf8_encode($row['id']),
