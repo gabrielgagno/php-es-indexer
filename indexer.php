@@ -73,9 +73,10 @@ $results = $conn->query($query);
 
 # initialize curl payload
 $payload = "";
+$row = 0;
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
-
+    echo ++$row;
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
     $payloadHalf = json_encode(array(
         "id" => utf8_encode($row['id']),
