@@ -70,10 +70,7 @@ echo "AUTOCOMMIT SET TO TRUE\n";
 $query = "select id, title, baseUrl, text, content from webpage where status = 2";
 
 $results = $conn->query($query);
-if(mysqli_error($conn)) {
-    echo "ERROR!";
-    die(mysqli_error($conn));
-}
+
 #bulk index using curl
 $curlUrl = "http://".$es_settings['host'].":".$es_settings['port']."/".$es_settings['index']."/webpage/_bulk";
 echo "CURL URL: ".$curlUrl;
@@ -83,6 +80,8 @@ $ch = curl_init();
 $payload = "";
 $rowNum = 1;
 $rowCount = $results->num_rows;
+var_dump($rowCount);
+die('dead');
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
