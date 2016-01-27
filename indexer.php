@@ -80,7 +80,9 @@ $ch = curl_init();
 $payload = "";
 $rowNum = 1;
 $rowCount = $results->num_rows;
-die($rowCount);
+if(mysqli_error($conn)) {
+    die(mysqli_error($conn));
+}
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
