@@ -80,7 +80,7 @@ $ch = curl_init();
 $payload = "";
 $rowNum = 1;
 $rowCount = $results->num_rows;
-var_dump($rowCount);
+echo $rowCount;
 die('dead');
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
