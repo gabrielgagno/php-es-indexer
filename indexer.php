@@ -79,7 +79,7 @@ $ch = curl_init();
 # initialize curl payload
 $payload = "";
 $rowNum = 1;
-$rowCount = mysqli_num_rows($results);
+$rowCount = $results->num_rows;
 die($rowCount);
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
