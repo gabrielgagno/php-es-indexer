@@ -80,8 +80,6 @@ $ch = curl_init();
 $payload = "";
 $rowNum = 1;
 $rowCount = $results->num_rows;
-echo $rowCount;
-die('dead');
 # for all results of query
 while($row = mysqli_fetch_assoc($results)) {
     $metas = MetaParser::parseMetaTagsFromHtmlString($row['content'], ['description', 'keywords']);
@@ -102,15 +100,15 @@ while($row = mysqli_fetch_assoc($results)) {
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POSTFIELDS => $payload
         ));
+        echo "\nindexing job: starting...\n";
+        #execute bulk index for 200 documents
+        $response = curl_exec($ch);
+        echo $response;
+        echo "indexing job: done.\n";
+        $payload = "";
     }
     $rowNum++;
 }
-
-echo "\nindexing job: starting...\n";
-#execute bulk index
-$response = curl_exec($ch);
-echo $response;
-echo "indexing job: done.\n";
 
 curl_close($ch);
 
